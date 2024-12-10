@@ -5,6 +5,8 @@ use_random_seed 49
 drum_amp = 2
 fx_amb = 2
 guitar_amp = 0.5
+second_guitar_amp = 0.2
+bass_amp = 1.5
 
 define :breakbeat do
   live_loop :drums do
@@ -53,8 +55,37 @@ define :electronic_guitar do
   end
 end
 
+define :breakcore_guitar do
+  live_loop :second_guitar, sync: :drums do
+    use_synth :prophet
+    with_fx :bitcrusher, bits: 6, mix: 0.7 do
+      with_fx :echo, phase: 0.125, decay: 1 do
+        notes = (scale :e3, :minor_pentatonic).shuffle.take(4)
+        4.times do
+          play notes.choose, release: 0.2, amp: second_guitar_amp, cutoff: rrand(90, 110)
+          sleep [0.125, 0.25].choose
+        end
+      end
+    end
+  end
+end
+
+define :bassline do
+  live_loop :bass, sync: :drums do
+    use_synth :fm
+    with_fx :lpf, cutoff: 80 do
+      bass_notes = (ring :e2, :g2, :b1, :d2, :f2, :e2, :d2)
+      play bass_notes.tick, release: 0.5, amp: bass_amp
+      sleep 0.5
+    end
+  end
+end
+
 breakbeat
 drum_variations
 fx_ambience
 fx_glitch
 electronic_guitar
+breakcore_guitar
+bassline
+
